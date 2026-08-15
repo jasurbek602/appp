@@ -1,0 +1,78 @@
+name: Android APK yig'ish
+
+# Qo'lda ishga tushirish (Actions tabidan "Run workflow") yoki main
+# branch'ga push qilinganda avtomatik ishlaydi.
+# Eslatma: "on" kaliti qo'shtirnoqsiz yozilsa, ba'zi YAML parserlar
+# (shu jumladan ba'zan GitHub'ning o'zi) uni "true" degan boolean
+# qiymat deb noto'g'ri o'qib, "No event triggers defined in `on`"
+# xatosini beradi - shuning uchun pastda "on" qo'shtirnoq ichida.
+"on":
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodni olish
+        uses: actions/checkout@v4
+
+      - name: Node.js o'rnatish
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: JDK o'rnatish (Android build uchun shart)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Loyiha bog'liqliklarini o'rnatish
+        run: npm install
+
+      - name: Capacitor o'rnatish
+        run: npm install @capacitor/core @capacitor/android && npm install -D @capacitor/cli
+
+      - name: Android platformasini yaratish
+        run: npx cap add android
+
+      - name: Kotlin stdlib "duplicate class" muammosini tuzatish
+        # Capacitor generatsiya qilgan loyihada ba'zi kutubxonalar
+        # kotlin-stdlib-jdk7/jdk8'ning eski (1.6.21) alohida modulini,
+        # boshqalari esa ularni allaqachon o'z ichiga olgan yangi
+        # kotlin-stdlib (1.8+) versiyasini tortadi - bu "Duplicate class"
+        # xatosiga olib keladi. Eski, endi keraksiz modullarni istisno
+        # qilamiz.
+        run: |
+          cat >> android/build.gradle << 'EOF'
+
+          allprojects {
+              configurations.all {
+                  exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+                  exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+              }
+          }
+          EOF
+
+      - name: Web fayllarni Android loyihasiga sinxronlash
+        run: npx cap sync android
+
+      - name: FLAG_SECURE (skrinshot/ekran yozuvini bloklash) qo'shish
+        run: |
+          MAIN_ACTIVITY=$(find android -name MainActivity.java | head -1)
+          echo "Topildi: $MAIN_ACTIVITY"
+          cp android-native-reference/MainActivity.java "$MAIN_ACTIVITY"
+
+      - name: Gradle bilan APK yig'ish (debug)
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: APK'ni yuklab olish uchun saqlash
+        uses: actions/upload-artifact@v4
+        with:
+          name: chemchat-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
