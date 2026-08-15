@@ -1,0 +1,8 @@
+{
+  "appId": "com.chemchat.app",
+  "appName": "ChemChat",
+  "webDir": "public",
+  "android": {
+    "allowMixedContent": false
+  }
+}

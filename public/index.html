@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>ChemChat</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="home-screen">
+    <div class="home-logo">🧪</div>
+    <h1 class="home-title">ChemChat</h1>
+    <p class="home-sub">Kimyoviy kalkulyator va xavfsiz suhbat — bitta ilovada</p>
+
+    <div class="home-buttons">
+      <a href="/calculator.html" class="home-btn">
+        <span class="home-btn-icon">🧮</span>
+        <span class="home-btn-text">
+          <strong>Kimyoviy kalkulyator</strong>
+          <small>Molyar massa, molarlik, suyultirish</small>
+        </span>
+      </a>
+      <a href="#" id="chatBtn" class="home-btn">
+        <span class="home-btn-icon">💬</span>
+        <span class="home-btn-text">
+          <strong>Chat</strong>
+          <small>Xavfsiz, shifrlangan suhbat</small>
+        </span>
+      </a>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    document.getElementById("chatBtn").addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await API.get("/api/users/me");
+        window.location.href = "/chat.html";
+      } catch (err) {
+        window.location.href = "/login.html";
+      }
+    });
+  </script>
+</body>
+</html>

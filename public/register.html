@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ro'yxatdan o'tish — SecureChat</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo"><span class="dot"></span> SecureChat</div>
+      <div class="auth-sub">Xavfsiz va maxfiy muloqot uchun hisob yarating</div>
+
+      <div class="error-box" id="errBox"></div>
+
+      <form id="regForm">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="masalan: javohir_dev" required minlength="3" pattern="[a-z0-9._]+" />
+        </div>
+        <div class="field">
+          <label>Ism (ixtiyoriy)</label>
+          <input type="text" id="fullName" placeholder="To'liq ismingiz" />
+        </div>
+        <div class="field">
+          <label>Parol</label>
+          <input type="password" id="password" placeholder="Kamida 8 belgi" required minlength="8" />
+        </div>
+        <div class="field">
+          <label>Xavfsizlik kalit so'zi</label>
+          <input type="text" id="secretKey" placeholder="Parolni tiklash uchun maxfiy so'z" required minlength="6" />
+          <div class="hint">⚠️ Bu so'zni eslab qoling — parolni unutsangiz faqat shu orqali tiklaysiz. Uni hech kimga aytmang.</div>
+        </div>
+        <button class="btn" type="submit">Ro'yxatdan o'tish</button>
+      </form>
+
+      <div class="link-row">Hisobingiz bormi? <a href="/login.html">Kirish</a></div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    document.getElementById("regForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById("errBox");
+      errBox.style.display = "none";
+      try {
+        await API.post("/api/auth/register", {
+          username: document.getElementById("username").value.trim(),
+          fullName: document.getElementById("fullName").value.trim(),
+          password: document.getElementById("password").value,
+          secretKey: document.getElementById("secretKey").value,
+        });
+        window.location.href = "/chat.html";
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

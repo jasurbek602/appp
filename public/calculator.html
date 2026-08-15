@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Kimyoviy kalkulyator</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="calc-screen">
+    <div class="calc-header">
+      <a href="/index.html" class="icon-btn" title="Orqaga">←</a>
+      <h1>🧮 Kimyoviy kalkulyator</h1>
+    </div>
+
+    <div class="calc-tabs">
+      <button class="calc-tab active" data-tab="molar">Molyar massa</button>
+      <button class="calc-tab" data-tab="molarity">Molarlik</button>
+      <button class="calc-tab" data-tab="dilution">Suyultirish</button>
+      <button class="calc-tab" data-tab="convert">Massa ↔ Mol</button>
+    </div>
+
+    <!-- Molyar massa -->
+    <section class="calc-panel active" id="panel-molar">
+      <label>Kimyoviy formula</label>
+      <input type="text" id="formulaInput" placeholder="Masalan: H2O, C6H12O6, Ca(OH)2, CuSO4*5H2O" />
+      <button class="calc-btn" id="calcMolarBtn">Hisoblash</button>
+      <div class="calc-result" id="molarResult"></div>
+    </section>
+
+    <!-- Molarlik: M = n / V -->
+    <section class="calc-panel" id="panel-molarity">
+      <p class="calc-hint">Molarlik (M) = mol miqdori (n) / hajm (V, litrda)</p>
+      <label>Erigan modda miqdori (mol)</label>
+      <input type="number" id="molarityMol" placeholder="masalan 0.5" step="any" />
+      <label>Eritma hajmi (litr)</label>
+      <input type="number" id="molarityVol" placeholder="masalan 2" step="any" />
+      <button class="calc-btn" id="calcMolarityBtn">Hisoblash</button>
+      <div class="calc-result" id="molarityResult"></div>
+    </section>
+
+    <!-- Suyultirish: C1V1 = C2V2 -->
+    <section class="calc-panel" id="panel-dilution">
+      <p class="calc-hint">Suyultirish qonuni: C₁V₁ = C₂V₂ — istalgan 3 tasini kiriting, 4-si topiladi</p>
+      <label>Boshlang'ich konsentratsiya C₁ (mol/L)</label>
+      <input type="number" id="dC1" placeholder="bo'sh qoldiring - agar shuni topmoqchi bo'lsangiz" step="any" />
+      <label>Boshlang'ich hajm V₁ (L)</label>
+      <input type="number" id="dV1" placeholder="bo'sh qoldiring - agar shuni topmoqchi bo'lsangiz" step="any" />
+      <label>Yakuniy konsentratsiya C₂ (mol/L)</label>
+      <input type="number" id="dC2" placeholder="bo'sh qoldiring - agar shuni topmoqchi bo'lsangiz" step="any" />
+      <label>Yakuniy hajm V₂ (L)</label>
+      <input type="number" id="dV2" placeholder="bo'sh qoldiring - agar shuni topmoqchi bo'lsangiz" step="any" />
+      <button class="calc-btn" id="calcDilutionBtn">Hisoblash</button>
+      <div class="calc-result" id="dilutionResult"></div>
+    </section>
+
+    <!-- Massa <-> Mol -->
+    <section class="calc-panel" id="panel-convert">
+      <p class="calc-hint">n = m / M (mol = massa / molyar massa)</p>
+      <label>Kimyoviy formula</label>
+      <input type="text" id="convFormula" placeholder="masalan: NaCl" />
+      <label>Massa (gramm) — mol topish uchun</label>
+      <input type="number" id="convMass" placeholder="masalan 58.5" step="any" />
+      <label>YOKI mol miqdori — massa topish uchun</label>
+      <input type="number" id="convMol" placeholder="masalan 1" step="any" />
+      <button class="calc-btn" id="calcConvertBtn">Hisoblash</button>
+      <div class="calc-result" id="convertResult"></div>
+    </section>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/chem-data.js"></script>
+  <script src="/js/calculator.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin panel — SecureChat</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="admin-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div class="auth-logo"><span class="dot"></span> Admin panel</div>
+      <div style="display:flex;gap:10px">
+        <div class="theme-toggle" id="themeToggle"><div class="knob"></div></div>
+        <a href="/chat.html" class="btn secondary" style="width:auto;padding:8px 14px">← Chatga qaytish</a>
+      </div>
+    </div>
+
+    <div class="admin-stats" id="stats"></div>
+
+    <h3>Foydalanuvchilar</h3>
+    <table id="usersTable">
+      <thead><tr><th>Username</th><th>Ism</th><th>Rol</th><th>Holat</th><th>Amal</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <h3 style="margin-top:28px">Aktiv chatlar</h3>
+    <table id="chatsTable">
+      <thead><tr><th>Ishtirokchilar</th><th>Oxirgi xabar</th><th>Amal</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="chatMessages" style="margin-top:20px"></div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    document.getElementById("themeToggle").addEventListener("click", () => Theme.toggle());
+
+    (async function initAdmin() {
+      let me;
+      try { me = (await API.get("/api/users/me")).user; } catch (e) { return window.location.href = "/login.html"; }
+      if (me.role !== "admin") { alert("Faqat admin uchun"); return window.location.href = "/chat.html"; }
+      document.documentElement.setAttribute("data-theme", me.theme || "dark");
+
+      const stats = await API.get("/api/admin/stats");
+      document.getElementById("stats").innerHTML = `
+        <div class="stat-card"><div class="stat-num">${stats.userCount}</div><div class="stat-lbl">Foydalanuvchilar</div></div>
+        <div class="stat-card"><div class="stat-num">${stats.chatCount}</div><div class="stat-lbl">Aktiv chatlar</div></div>
+        <div class="stat-card"><div class="stat-num">${stats.messageCount}</div><div class="stat-lbl">Xabarlar</div></div>
+        <div class="stat-card"><div class="stat-num">${stats.mediaCount}</div><div class="stat-lbl">Media fayllar</div></div>
+      `;
+
+      const { users } = await API.get("/api/admin/users");
+      document.querySelector("#usersTable tbody").innerHTML = users.map((u) => `
+        <tr>
+          <td>${u.username}</td>
+          <td>${u.fullName || "—"}</td>
+          <td>${u.role}</td>
+          <td>${u.isBanned ? "🚫 Bloklangan" : "✅ Faol"}</td>
+          <td><button class="btn secondary" style="width:auto;padding:5px 10px;font-size:11px" data-id="${u._id}" data-banned="${u.isBanned}">${u.isBanned ? "Blokdan chiqarish" : "Bloklash"}</button></td>
+        </tr>`).join("");
+
+      document.querySelectorAll("#usersTable button").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          await API.patch(`/api/admin/users/${btn.dataset.id}/ban`, { isBanned: btn.dataset.banned !== "true" });
+          initAdmin();
+        });
+      });
+
+      const { chats } = await API.get("/api/admin/chats");
+      document.querySelector("#chatsTable tbody").innerHTML = chats.map((c) => `
+        <tr>
+          <td>${c.participants.map(p => p.username).join(" ↔ ")}</td>
+          <td>${new Date(c.lastMessageAt).toLocaleString("uz-UZ")}</td>
+          <td><button class="btn secondary" style="width:auto;padding:5px 10px;font-size:11px" data-id="${c._id}">Ko'rish</button></td>
+        </tr>`).join("");
+
+      document.querySelectorAll("#chatsTable button").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const { messages } = await API.get(`/api/admin/chats/${btn.dataset.id}/messages`);
+          document.getElementById("chatMessages").innerHTML = `
+            <h3>Xabarlar</h3>
+            <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;padding:14px;max-height:400px;overflow-y:auto">
+              ${messages.map(m => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+                <b>${m.sender}</b>: ${m.text ? m.text : `[${m.type}] ${m.media?.url || ""}`}
+                <div style="color:var(--text-dim);font-size:11px">${new Date(m.createdAt).toLocaleString("uz-UZ")}</div>
+              </div>`).join("")}
+            </div>`;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kirish — SecureChat</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card" id="loginCard">
+      <div class="auth-logo"><span class="dot"></span> SecureChat</div>
+      <div class="auth-sub">Hisobingizga kiring</div>
+      <div class="error-box" id="errBox1"></div>
+      <form id="loginForm">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="lUsername" required />
+        </div>
+        <div class="field">
+          <label>Parol</label>
+          <input type="password" id="lPassword" required />
+        </div>
+        <button class="btn" type="submit">Kirish</button>
+      </form>
+      <div class="link-row">
+        <a href="#" id="showForgot">Parolni unutdingizmi?</a>
+      </div>
+      <div class="link-row">Hisobingiz yo'qmi? <a href="/register.html">Ro'yxatdan o'tish</a></div>
+    </div>
+
+    <div class="auth-card" id="forgotCard" style="display:none">
+      <div class="auth-logo"><span class="dot"></span> Parolni tiklash</div>
+      <div class="auth-sub">Xavfsizlik kalit so'zingizni kiriting</div>
+      <div class="error-box" id="errBox2"></div>
+
+      <form id="verifyForm">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="fUsername" required />
+        </div>
+        <div class="field">
+          <label>Xavfsizlik kalit so'zi</label>
+          <input type="text" id="fSecretKey" required />
+        </div>
+        <button class="btn" type="submit">Tekshirish</button>
+      </form>
+
+      <form id="resetForm" style="display:none; margin-top:14px">
+        <div class="field">
+          <label>Yangi parol</label>
+          <input type="password" id="newPassword" required minlength="8" />
+        </div>
+        <button class="btn" type="submit">Parolni yangilash</button>
+      </form>
+
+      <div class="link-row"><a href="#" id="backToLogin">← Kirishga qaytish</a></div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById("errBox1");
+      errBox.style.display = "none";
+      try {
+        await API.post("/api/auth/login", {
+          username: document.getElementById("lUsername").value.trim(),
+          password: document.getElementById("lPassword").value,
+        });
+        window.location.href = "/chat.html";
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.style.display = "block";
+      }
+    });
+
+    document.getElementById("showForgot").addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("loginCard").style.display = "none";
+      document.getElementById("forgotCard").style.display = "block";
+    });
+    document.getElementById("backToLogin").addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("forgotCard").style.display = "none";
+      document.getElementById("loginCard").style.display = "block";
+    });
+
+    let resetToken = null;
+    document.getElementById("verifyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById("errBox2");
+      errBox.style.display = "none";
+      try {
+        const data = await API.post("/api/auth/forgot-password/verify", {
+          username: document.getElementById("fUsername").value.trim(),
+          secretKey: document.getElementById("fSecretKey").value,
+        });
+        resetToken = data.resetToken;
+        document.getElementById("verifyForm").style.display = "none";
+        document.getElementById("resetForm").style.display = "block";
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.style.display = "block";
+      }
+    });
+
+    document.getElementById("resetForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById("errBox2");
+      errBox.style.display = "none";
+      try {
+        await API.post("/api/auth/forgot-password/reset", {
+          resetToken,
+          newPassword: document.getElementById("newPassword").value,
+        });
+        showToast("Parol yangilandi! Endi kiring.");
+        setTimeout(() => window.location.href = "/login.html", 1200);
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

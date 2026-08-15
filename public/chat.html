@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SecureChat</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-top-row">
+          <div class="me" id="meBox">
+            <div class="avatar" id="meAvatar">?</div>
+            <div class="username-lbl" id="meName">…</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="theme-toggle" id="themeToggle" title="Mavzuni almashtirish"><div class="knob"></div></div>
+            <a href="#" id="logoutBtn" class="icon-btn" title="Chiqish">⏻</a>
+            <a href="/admin.html" id="adminLink" class="icon-btn" title="Admin panel" style="display:none">🛡️</a>
+          </div>
+        </div>
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Username bo'yicha qidirish..." />
+        </div>
+      </div>
+
+      <div id="searchResults" class="search-results" style="display:none"></div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="chats">Chatlar</div>
+        <div class="tab" data-tab="requests">So'rovlar <span id="reqCount"></span></div>
+        <div class="tab" data-tab="ghost">👻 Sharpa</div>
+      </div>
+
+      <div class="chat-list" id="chatList"></div>
+    </div>
+
+    <!-- CHAT WINDOW -->
+    <div class="chat-window" id="chatWindow">
+      <div class="empty-state" id="emptyState">Suhbatni boshlash uchun chapdan chat tanlang<br/>yoki username bo'yicha qidiring.</div>
+
+      <div id="activeChat" style="display:none; flex-direction:column; height:100%">
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <button class="icon-btn" id="backBtn" title="Orqaga">←</button>
+            <div class="avatar" id="partnerAvatar">?</div>
+            <div>
+              <div class="item-name" id="partnerName">—</div>
+              <div class="item-preview" id="partnerStatus">—</div>
+            </div>
+          </div>
+          <div class="chat-header-actions">
+            <button class="icon-btn" id="stealthBtn" title="👻 Sharpa: O'qildi belgisini yashirish">👻</button>
+            <button class="icon-btn" id="ssBtn" title="Screenshotni cheklash">🛡️</button>
+            <button class="icon-btn" id="deleteChatBtn" title="Chatni butunlay o'chirish">🗑️</button>
+          </div>
+        </div>
+
+        <div class="messages screenshot-guard" id="messages"></div>
+
+        <div class="editing-bar" id="editingBar" style="display:none">
+          <span>✏️ Xabarni tahrirlash</span>
+          <button type="button" class="icon-btn" id="cancelEditBtn" title="Bekor qilish">✕</button>
+        </div>
+
+        <div class="composer">
+          <input type="file" id="mediaInput" accept="image/*,video/*" style="display:none" />
+          <button class="icon-btn" id="attachBtn" title="Rasm/Video yuborish">📎</button>
+          <input type="text" id="textInput" placeholder="Xabar yozing..." />
+          <button class="icon-btn" id="pitchBtn" title="Ovozni o'zgartirish rejimi">🎚️</button>
+          <button class="icon-btn record" id="recordBtn" title="Ovozli xabar">🎤</button>
+          <button class="icon-btn" id="sendBtn" title="Yuborish">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/ghost.js"></script>
+  <script src="/js/audio.js"></script>
+  <script src="/js/screenshot-guard.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
