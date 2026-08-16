@@ -4,7 +4,7 @@
 // so'rovlar to'g'ridan-to'g'ri jonli backend manziliga yuboriladi.
 // Veb-saytning o'zida (oddiy brauzerda) esa hech narsa o'zgarmaydi.
 const API_BASE = (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
-  ? "https://securitychat-three.vercel.app"
+  ? "https://wxchat0.vercel.app"
   : "";
 
 const API = {
